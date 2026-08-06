@@ -10,11 +10,6 @@ Every command is derived from the MCP server's live `tools/list` schema at runti
 hand-written subcommand per tool, so it stays in sync automatically as the server's tool
 surface changes across deploys. See [How it works](#how-it-works).
 
-**Setting this up for an AI coding agent instead of yourself?** Paste
-[INSTALL_FOR_AGENTS.md](./INSTALL_FOR_AGENTS.md) into it — covers install, profile setup
-(without the agent ever seeing your API key), and how to translate `mixiopro/skills` tool
-names for agents that don't have an MCP client.
-
 ## Install
 
 **Linux & macOS:**
@@ -32,6 +27,21 @@ Prebuilt binary for Linux (x86_64/aarch64), macOS (Intel/Apple Silicon), and Win
 ```bash
 cargo install --path .
 ```
+
+**Setting this up via an AI coding agent instead?** Paste this into Claude Code, Codex,
+Gemini CLI, Antigravity, or any agent with shell access — MCP client or not:
+
+> Install the Mixio CLI for me. Detect my OS and run the matching command above (prebuilt
+> binary, no Rust toolchain needed), then confirm with `mixio --help`.
+>
+> Then I need a profile, which needs an `sk-...` API key from Mixio Studio → Settings → API
+> Keys. Do **not** run `mixio auth add <name> --key <value>` and do not ask me to paste the
+> key into this chat — a credential typed into an agent conversation is a credential that
+> agent now holds. Instead ask me to run `mixio auth add myorg` myself, in my own terminal —
+> it prompts for the key with hidden input — and wait for me to confirm it's done.
+>
+> Once that's done, run `mixio tools refresh`, then `mixio call ping` and
+> `mixio project list` to verify, and tell me what came back.
 
 ## Quick start
 
