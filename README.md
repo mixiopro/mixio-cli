@@ -10,6 +10,11 @@ Every command is derived from the MCP server's live `tools/list` schema at runti
 hand-written subcommand per tool, so it stays in sync automatically as the server's tool
 surface changes across deploys. See [How it works](#how-it-works).
 
+**Setting this up for an AI coding agent instead of yourself?** Paste
+[INSTALL_FOR_AGENTS.md](./INSTALL_FOR_AGENTS.md) into it — covers install, profile setup
+(without the agent ever seeing your API key), and how to translate `mixiopro/skills` tool
+names for agents that don't have an MCP client.
+
 ## Install
 
 **Linux & macOS:**
@@ -55,6 +60,23 @@ cargo install --path .
 
 `mixio auth use <name>` switches the active profile; `mixio auth list` shows all of them.
 Re-run `mixio tools refresh` after a Mixio deploy to pick up new/changed tools.
+
+## Relationship to mixiopro/skills
+
+[`mixiopro/skills`](https://github.com/mixiopro/skills) is the domain knowledge — what order
+to call things in, what a field means, when to gate on approval. That's transport-agnostic;
+it doesn't change whether the call happens over MCP or a shell command. This CLI is a second
+front door onto the exact same backend, for consumers that don't have (or don't want) an MCP
+client wired into their harness: humans at a terminal, CI/cron/scripts, or agents with only
+shell access.
+
+The one thing that *does* differ: the skills docs name tools like `studio_list_projects`,
+because that prefix is added by the local `@mixio-pro/mcp` proxy when it forwards tools. The
+raw hosted MCP endpoint this CLI talks to directly has no such prefix — strip it and you have
+the CLI command: `studio_list_projects` → `mixio call list-projects`, or the shorter
+noun-verb form where one was cleanly derivable (`mixio project list`; see
+[How it works](#how-it-works) for what "cleanly derivable" means). `mixio list-tools` shows
+the full current set.
 
 ## How it works
 
