@@ -105,6 +105,10 @@ real CLI at runtime with no codegen step:
   one verb doesn't form a group (not worth inventing structure for).
 - `mixio call <raw-tool-name>` is always available as the ground-truth escape hatch, including
   for anything the grouping heuristic declined to alias.
+- The raw tool name and the grouped alias use different word orders on purpose — MCP tools
+  read verb-first (`get_project`, matching how the server and `mixiopro/skills` name them),
+  the CLI shortcut reads noun-first (`mixio project get`, matching CLI convention, same as
+  `gh`/`docker`). `mixio list-tools` shows both side by side for exactly this reason.
 
 ## Development
 
