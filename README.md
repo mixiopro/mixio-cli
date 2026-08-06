@@ -60,30 +60,22 @@ Re-run `mixio tools refresh` after a Mixio deploy to pick up new/changed tools.
 
 ### Just ask the agent
 
-Every command is self-documenting straight from the live schema, so the agent doesn't need to
-have read this README — it can discover everything by running the CLI itself:
+Every command is self-documenting straight from the live schema, so an agent doesn't need to
+have read this README — it discovers everything by running the CLI itself, via `--help`. One
+paste installs it and sets up persistent instructions in your agent's memory file:
 
-```
-Install mixio-cli (see its README for the one-line installer for your OS), then use it.
-Run `mixio --help` to see what's available.
-```
+> Install mixio-cli: detect my OS and run the matching one-liner from the Install section of
+> https://github.com/mixiopro/mixio-cli, then confirm with `mixio --help`. Add a "## Mixio"
+> section to my AGENTS.md or CLAUDE.md: use `mixio` for Mixio Studio (projects, episodes,
+> generation jobs) — `mixio --help` for commands, `mixio <noun> --help` for a resource's
+> operations, `mixio call --help` for the full tool set by raw name. Then check whether a
+> profile exists (`mixio auth list`); if not, ask me to run `mixio auth add <name>` myself, in
+> my own terminal, and wait for me to confirm — never run that with `--key`, and never ask me
+> to paste an API key into this chat.
 
-The one thing worth spelling out explicitly, because an agent has no way to infer it: **don't
-handle the API key yourself.** `mixio auth add <name>` needs an `sk-...` key from Mixio
-Studio → Settings → API Keys — it prompts for it with hidden input. Don't run it with
-`--key <value>`, and don't ask the human to paste the key into the conversation; ask them to
-run `mixio auth add <name>` themselves and confirm when it's done.
-
-### Persistent instructions (AGENTS.md / CLAUDE.md)
-
-```markdown
-## Mixio
-
-Use `mixio` for Mixio Studio (projects, episodes, generation jobs). Run `mixio --help` for
-commands, `mixio <noun> --help` for a resource's operations, `mixio call --help` for the full
-tool set by raw name. If no profile is set up yet, ask me to run `mixio auth add <name>`
-myself — never type or request my API key directly.
-```
+The credential rule is the one thing worth stating explicitly every time: an agent has no way
+to infer on its own that it shouldn't handle the key, since nothing about `mixio auth add`
+looks different from any other setup command until it prompts for one.
 
 ### Coming from mixiopro/skills
 
