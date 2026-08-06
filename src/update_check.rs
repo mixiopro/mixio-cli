@@ -1,6 +1,6 @@
 //! Lightweight, rate-limited "a newer version exists" notice — this never
 //! modifies anything itself. The actual update mechanism is the
-//! `mixio-update` companion binary cargo-dist installs alongside `mixio`
+//! `mixio-cli-update` companion binary cargo-dist installs alongside `mixio`
 //! (`install-updater` in dist-workspace.toml); this just tells you when to
 //! run it.
 //!
@@ -68,10 +68,10 @@ fn notice(current: &str, latest: &str) -> Option<String> {
     if is_breaking(current, latest) {
         Some(format!(
             "mixio {latest} is available and may change CLI behavior ({current} -> {latest}) — \
-             check {url} before running `mixio-update`"
+             check {url} before running `mixio-cli-update`"
         ))
     } else {
-        Some(format!("a newer mixio is available: {current} -> {latest} — run `mixio-update`"))
+        Some(format!("a newer mixio is available: {current} -> {latest} — run `mixio-cli-update`"))
     }
 }
 

@@ -1,6 +1,6 @@
 [package]
 name = "mixio-cli"
-version = "0.0.4"
+version = "0.0.5"
 edition = "2021"
 description = "CLI for Mixio Studio — profiles across orgs, dynamic client for the hosted MCP tool surface"
 homepage = "https://mixio.studio"
