@@ -28,21 +28,6 @@ Prebuilt binary for Linux (x86_64/aarch64), macOS (Intel/Apple Silicon), and Win
 cargo install --path .
 ```
 
-**Setting this up via an AI coding agent instead?** Paste this into Claude Code, Codex,
-Gemini CLI, Antigravity, or any agent with shell access — MCP client or not:
-
-> Install the Mixio CLI for me. Detect my OS and run the matching command above (prebuilt
-> binary, no Rust toolchain needed), then confirm with `mixio --help`.
->
-> Then I need a profile, which needs an `sk-...` API key from Mixio Studio → Settings → API
-> Keys. Do **not** run `mixio auth add <name> --key <value>` and do not ask me to paste the
-> key into this chat — a credential typed into an agent conversation is a credential that
-> agent now holds. Instead ask me to run `mixio auth add myorg` myself, in my own terminal —
-> it prompts for the key with hidden input — and wait for me to confirm it's done.
->
-> Once that's done, run `mixio tools refresh`, then `mixio call ping` and
-> `mixio project list` to verify, and tell me what came back.
-
 ## Quick start
 
 1. **Get an API key** — Mixio Studio → Settings → API Keys → Create Key (`sk-...`).
@@ -71,18 +56,43 @@ Gemini CLI, Antigravity, or any agent with shell access — MCP client or not:
 `mixio auth use <name>` switches the active profile; `mixio auth list` shows all of them.
 Re-run `mixio tools refresh` after a Mixio deploy to pick up new/changed tools.
 
-## Relationship to mixiopro/skills
+## For AI agents
 
-[`mixiopro/skills`](https://github.com/mixiopro/skills) is the domain knowledge — what order
-to call things in, what a field means, when to gate on approval. That's transport-agnostic;
-it doesn't change whether the call happens over MCP or a shell command. This CLI is a second
-front door onto the exact same backend, for consumers that don't have (or don't want) an MCP
-client wired into their harness: humans at a terminal, CI/cron/scripts, or agents with only
-shell access.
+### Just ask the agent
 
-The one thing that *does* differ: the skills docs name tools like `studio_list_projects`,
-because that prefix is added by the local `@mixio-pro/mcp` proxy when it forwards tools. The
-raw hosted MCP endpoint this CLI talks to directly has no such prefix — strip it and you have
+Every command is self-documenting straight from the live schema, so the agent doesn't need to
+have read this README — it can discover everything by running the CLI itself:
+
+```
+Install mixio-cli (see its README for the one-line installer for your OS), then use it.
+Run `mixio --help` to see what's available.
+```
+
+The one thing worth spelling out explicitly, because an agent has no way to infer it: **don't
+handle the API key yourself.** `mixio auth add <name>` needs an `sk-...` key from Mixio
+Studio → Settings → API Keys — it prompts for it with hidden input. Don't run it with
+`--key <value>`, and don't ask the human to paste the key into the conversation; ask them to
+run `mixio auth add <name>` themselves and confirm when it's done.
+
+### Persistent instructions (AGENTS.md / CLAUDE.md)
+
+```markdown
+## Mixio
+
+Use `mixio` for Mixio Studio (projects, episodes, generation jobs). Run `mixio --help` for
+commands, `mixio <noun> --help` for a resource's operations, `mixio call --help` for the full
+tool set by raw name. If no profile is set up yet, ask me to run `mixio auth add <name>`
+myself — never type or request my API key directly.
+```
+
+### Coming from mixiopro/skills
+
+[`mixiopro/skills`](https://github.com/mixiopro/skills) is the domain knowledge for
+MCP-native agents (Claude Code, Cursor, etc. with an MCP client configured) — what order to
+call things in, what a field means, when to gate on approval. That knowledge is
+transport-agnostic; only the tool names differ. The skills docs say `studio_list_projects`
+because that prefix is added by the local `@mixio-pro/mcp` proxy when it forwards tools — the
+raw hosted MCP endpoint this CLI talks to directly has no such prefix. Strip it and you have
 the CLI command: `studio_list_projects` → `mixio call list-projects`, or the shorter
 noun-verb form where one was cleanly derivable (`mixio project list`; see
 [How it works](#how-it-works) for what "cleanly derivable" means). `mixio list-tools` shows
