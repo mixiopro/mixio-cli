@@ -10,6 +10,17 @@ surface changes across deploys. See [`src/schema.rs`](src/schema.rs) and
 
 ## Install
 
+**Linux & macOS:**
+```bash
+curl -fsSL https://raw.githubusercontent.com/mixiopro/mixio-cli/master/install.sh | bash
+```
+
+**Windows:**
+```powershell
+powershell -c "irm https://raw.githubusercontent.com/mixiopro/mixio-cli/master/install.ps1 | iex"
+```
+
+Prebuilt binary, no Rust toolchain required. Building from source instead:
 ```bash
 cargo install --path .
 ```
