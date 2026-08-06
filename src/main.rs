@@ -3,6 +3,7 @@ mod groups;
 mod mcp;
 mod profile;
 mod schema;
+mod update_check;
 
 use anyhow::{bail, Context, Result};
 use clap::{Arg, Command};
@@ -13,6 +14,11 @@ const RESERVED_NAMES: &[&str] = &["auth", "tools", "list-tools", "call", "help"]
 
 #[tokio::main]
 async fn main() -> Result<()> {
+    // Runs concurrently with whatever command follows — free when cached
+    // (no network call), bounded by a short timeout otherwise. Awaited at
+    // the very end so it never adds latency to the actual command.
+    let update_check = update_check::spawn();
+
     let profile_name = profile::active().ok().map(|p| p.name);
     let cached = profile_name.as_deref().and_then(cache::load);
     let groups = cached.as_ref().map(|c| groups::derive(&c.tools)).unwrap_or_default();
@@ -108,6 +114,10 @@ async fn main() -> Result<()> {
             invoke(&cached, tool_name, verb_matches).await?;
         }
         None => unreachable!("subcommand_required"),
+    }
+
+    if let Ok(Some(notice)) = update_check.await {
+        eprintln!("{notice}");
     }
     Ok(())
 }
