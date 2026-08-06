@@ -78,7 +78,7 @@ async fn main() -> Result<()> {
     match matches.subcommand() {
         Some(("auth", sub)) => handle_auth(sub)?,
         Some(("tools", sub)) => handle_tools(sub).await?,
-        Some(("list-tools", _)) => handle_list_tools(&cached)?,
+        Some(("list-tools", _)) => handle_list_tools(&cached, &groups)?,
         Some(("call", sub)) => {
             let Some((display_name, tool_matches)) = sub.subcommand() else {
                 bail!("specify a tool — see `mixio call --help`");
@@ -162,13 +162,30 @@ async fn handle_tools(sub: &clap::ArgMatches) -> Result<()> {
     Ok(())
 }
 
-fn handle_list_tools(cached: &Option<cache::CachedTools>) -> Result<()> {
+fn handle_list_tools(cached: &Option<cache::CachedTools>, groups: &groups::Groups) -> Result<()> {
     let cached = cached.as_ref().context("no cached tools — run `mixio tools refresh`")?;
     warn_if_stale(cached);
     for tool in &cached.tools {
-        println!("{}\t{}", schema::to_kebab(&tool.name), tool.description);
+        let display = schema::to_kebab(&tool.name);
+        match alias_for(groups, &tool.name) {
+            Some(alias) => println!("{display} (mixio {alias})\t{}", tool.description),
+            None => println!("{display}\t{}", tool.description),
+        }
     }
     Ok(())
+}
+
+/// The `mixio <noun> <verb>` shortcut for a raw tool name, if `groups.rs`
+/// derived one — same relationship `call` and the grouped commands already
+/// share, just surfaced where a reader would actually be confused: skills
+/// docs name tools verb-first (`get_project`, matching the MCP convention),
+/// this CLI's grouped shortcuts are noun-first (`mixio project get`,
+/// matching CLI convention). Same tool, two calling conventions for two
+/// different audiences — this makes that undeniable instead of surprising.
+fn alias_for(groups: &groups::Groups, tool_name: &str) -> Option<String> {
+    groups.iter().find_map(|(noun, verbs)| {
+        verbs.iter().find_map(|(verb, raw)| (raw == tool_name).then(|| format!("{noun} {verb}")))
+    })
 }
 
 /// Shared by `mixio call <tool>` and every derived `mixio <noun> <verb>` —
