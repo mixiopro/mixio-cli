@@ -29,6 +29,7 @@ async fn main() -> Result<()> {
 
     let mut cli = Command::new("mixio")
         .about("Mixio Studio CLI — profiles, and a dynamic client for the hosted MCP tool surface")
+        .version(env!("CARGO_PKG_VERSION"))
         .subcommand_required(true)
         .arg_required_else_help(true)
         .subcommand(
