@@ -38,25 +38,7 @@ async fn main() -> Result<()> {
         .version(env!("CARGO_PKG_VERSION"))
         .subcommand_required(true)
         .arg_required_else_help(true)
-        .subcommand(
-            Command::new("auth")
-                .about("Manage profiles (one per org/account)")
-                .subcommand_required(true)
-                .subcommand(
-                    Command::new("add")
-                        .about("Add a profile, storing its API key")
-                        .arg(Arg::new("name").required(true))
-                        .arg(Arg::new("key").long("key").help("sk-... API key; prompted if omitted"))
-                        .arg(
-                            Arg::new("base-url")
-                                .long("base-url")
-                                .default_value(profile::DEFAULT_BASE_URL),
-                        ),
-                )
-                .subcommand(Command::new("use").about("Switch the active profile").arg(Arg::new("name").required(true)))
-                .subcommand(Command::new("list").about("List profiles"))
-                .subcommand(Command::new("remove").about("Remove a profile").arg(Arg::new("name").required(true))),
-        )
+        .subcommand(auth_command())
         .subcommand(
             Command::new("tools")
                 .about("Manage the cached MCP tool schema")
@@ -122,6 +104,27 @@ async fn main() -> Result<()> {
     Ok(())
 }
 
+fn auth_command() -> Command {
+    Command::new("auth")
+        .about("Manage profiles (one per org/account)")
+        .subcommand_required(true)
+        .subcommand(
+            Command::new("add")
+                .about("Add a profile, storing its API key")
+                .arg(Arg::new("name").required(true))
+                .arg(Arg::new("key").long("key").help("sk-... API key; prompted if omitted"))
+                .arg(
+                    Arg::new("base-url")
+                        .long("base-url")
+                        .default_value(profile::DEFAULT_BASE_URL),
+                ),
+        )
+        .subcommand(Command::new("use").about("Switch the active profile").arg(Arg::new("name").required(true)))
+        .subcommand(Command::new("list").about("List profiles"))
+        .subcommand(Command::new("whoami").about("Show the active profile"))
+        .subcommand(Command::new("remove").about("Remove a profile").arg(Arg::new("name").required(true)))
+}
+
 fn handle_auth(sub: &clap::ArgMatches) -> Result<()> {
     match sub.subcommand() {
         Some(("add", m)) => {
@@ -147,6 +150,9 @@ fn handle_auth(sub: &clap::ArgMatches) -> Result<()> {
             for (name, meta, is_active) in profiles {
                 println!("{} {name}\t{}", if is_active { "*" } else { " " }, meta.base_url);
             }
+        }
+        Some(("whoami", _)) => {
+            println!("{}", profile::active()?.name);
         }
         Some(("remove", m)) => {
             let name = m.get_one::<String>("name").unwrap();
@@ -258,5 +264,16 @@ fn unwrap_text_content(result: &Value) -> Option<String> {
 fn warn_if_stale(cached: &cache::CachedTools) {
     if cached.is_stale(cache::DEFAULT_TTL_SECS) {
         eprintln!("warning: tool cache is stale — run `mixio tools refresh`");
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn auth_whoami_is_exposed() {
+        let matches = auth_command().try_get_matches_from(["auth", "whoami"]).unwrap();
+        assert_eq!(matches.subcommand_name(), Some("whoami"));
     }
 }
