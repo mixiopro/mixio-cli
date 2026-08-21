@@ -10,7 +10,7 @@ use clap::{Arg, Command};
 use mcp::McpClient;
 use serde_json::Value;
 
-const RESERVED_NAMES: &[&str] = &["auth", "tools", "list-tools", "call", "help"];
+const RESERVED_NAMES: &[&str] = &["auth", "tools", "list-tools", "call", "upgrade", "help"];
 
 #[tokio::main]
 async fn main() -> Result<()> {
@@ -46,6 +46,7 @@ async fn main() -> Result<()> {
                 .subcommand(Command::new("refresh").about("Re-fetch tools/list from the active profile's MCP endpoint")),
         )
         .subcommand(Command::new("list-tools").about("List cached MCP tools"))
+        .subcommand(upgrade_command())
         .subcommand(call_cmd);
 
     // Derived `mixio <noun> <verb>` shortcuts — see groups.rs for why a noun
@@ -68,6 +69,7 @@ async fn main() -> Result<()> {
         Some(("auth", sub)) => handle_auth(sub)?,
         Some(("tools", sub)) => handle_tools(sub).await?,
         Some(("list-tools", _)) => handle_list_tools(&cached, &groups)?,
+        Some(("upgrade", _)) => handle_upgrade()?,
         Some(("call", sub)) => {
             let Some((display_name, tool_matches)) = sub.subcommand() else {
                 bail!("specify a tool — see `mixio call --help`");
@@ -123,6 +125,30 @@ fn auth_command() -> Command {
         .subcommand(Command::new("list").about("List profiles"))
         .subcommand(Command::new("whoami").about("Show the active profile"))
         .subcommand(Command::new("remove").about("Remove a profile").arg(Arg::new("name").required(true)))
+}
+
+fn upgrade_command() -> Command {
+    Command::new("upgrade").about("Upgrade mixio to the latest release")
+}
+
+fn handle_upgrade() -> Result<()> {
+    let updater_name = if cfg!(windows) {
+        "mixio-cli-update.exe"
+    } else {
+        "mixio-cli-update"
+    };
+    let updater = std::env::current_exe()
+        .ok()
+        .and_then(|exe| exe.parent().map(|dir| dir.join(updater_name)))
+        .filter(|path| path.is_file())
+        .unwrap_or_else(|| updater_name.into());
+    let status = std::process::Command::new(&updater)
+        .status()
+        .with_context(|| format!("could not run updater `{}`", updater.display()))?;
+    if !status.success() {
+        bail!("updater `{}` failed", updater.display());
+    }
+    Ok(())
 }
 
 fn handle_auth(sub: &clap::ArgMatches) -> Result<()> {
@@ -275,5 +301,14 @@ mod tests {
     fn auth_whoami_is_exposed() {
         let matches = auth_command().try_get_matches_from(["auth", "whoami"]).unwrap();
         assert_eq!(matches.subcommand_name(), Some("whoami"));
+    }
+
+    #[test]
+    fn upgrade_command_is_exposed() {
+        let matches = Command::new("mixio")
+            .subcommand(upgrade_command())
+            .try_get_matches_from(["mixio", "upgrade"])
+            .unwrap();
+        assert_eq!(matches.subcommand_name(), Some("upgrade"));
     }
 }

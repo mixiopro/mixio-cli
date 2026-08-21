@@ -53,7 +53,7 @@ cargo install --path .
    mixio project create --title "My Project"
    ```
 
-`mixio auth use <name>` switches the active profile; `mixio auth whoami` shows the active profile name; `mixio auth list` shows all of them.
+`mixio auth use <name>` switches the active profile; `mixio auth whoami` shows the active profile name; `mixio auth list` shows all of them. `mixio upgrade` installs the latest CLI release.
 Re-run `mixio tools refresh` after a Mixio deploy to pick up new/changed tools.
 
 ## For AI agents
