@@ -1,0 +1,49 @@
+# Managed by MIXSTUDIO-501. Offline only; live Plane readback remains required.
+name: Mixio maintainer tracking
+on:
+  pull_request:
+    types: [opened, edited, synchronize, reopened, ready_for_review]
+  push:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  tracking:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check tracking instructions and governing PR ticket
+        run: |
+          python3 - <<'PYTRACKING'
+          import hashlib, json, os, re
+          from pathlib import Path
+
+          EXPECTED_PROJECT = 'MIXSTUDIO'
+          PROTOCOL_SHA256 = '818738aa89acef58611e21e84858b7a51bf76cbd49a8e282d4e0f319b39097ff'
+          BLOCK_SHA256 = 'bacf248e56134b79be9d87fc9a301c9feb59d71710851024c049b1f1d985c310'
+          VERSION = '2026-09-11.1'
+          GOVERNANCE_TICKET = 'MIXSTUDIO-501'
+
+          protocol = Path('docs/tracking-protocol.md')
+          if not protocol.is_file() or hashlib.sha256(protocol.read_bytes()).hexdigest() != PROTOCOL_SHA256:
+              raise SystemExit('Tracking protocol missing or changed: propagate the reviewed protocol and refresh this guard hash.')
+          for filename in ('AGENTS.md', 'CLAUDE.md'):
+              path = Path(filename)
+              if not path.is_file():
+                  raise SystemExit(f'{filename}: maintainer tracking instructions missing')
+              text = path.read_text()
+              pattern = rf'<!-- BEGIN MIXIO TRACKING v{re.escape(VERSION)} -->[\s\S]*?<!-- END MIXIO TRACKING -->\n'
+              blocks = re.findall(pattern, text)
+              if len(blocks) != 1 or hashlib.sha256(blocks[0].encode()).hexdigest() != BLOCK_SHA256:
+                  raise SystemExit(f'{filename}: expected one reviewed tracking block (CLAUDE may symlink AGENTS)')
+          if os.environ.get('GITHUB_EVENT_NAME') == 'pull_request':
+              event = json.loads(Path(os.environ['GITHUB_EVENT_PATH']).read_text())
+              body = event['pull_request'].get('body') or ''
+              visible = re.sub(r'<!--[\s\S]*?(?:-->|$)|(`{3,}|~{3,})[\s\S]*?(?:\1|$)', '', body)
+              lines = re.findall(r'(?im)^\s*(?:[-*]\s*)?(?:Plane|Tracking|Tickets?)\s*:\s*(.+)$', visible)
+              tickets = set(re.findall(r'\b[A-Z][A-Z0-9]*-[1-9][0-9]*\b', '\n'.join(lines)))
+              if not any(ticket.startswith(EXPECTED_PROJECT + '-') or ticket == GOVERNANCE_TICKET for ticket in tickets):
+                  raise SystemExit(f'Add an explicit Plane: {EXPECTED_PROJECT}-123 line with the governing ticket. MIXSTUDIO-501 is authorized for this tracking rollout.')
+              print('PR ticket syntax and ownership pass; live Plane verification remains a maintainer checkpoint.')
+          print('Maintainer tracking protocol and instruction hashes pass.')
+          PYTRACKING
