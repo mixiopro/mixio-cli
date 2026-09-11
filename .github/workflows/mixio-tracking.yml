@@ -19,9 +19,9 @@ jobs:
           from pathlib import Path
 
           EXPECTED_PROJECT = 'MIXSTUDIO'
-          PROTOCOL_SHA256 = '818738aa89acef58611e21e84858b7a51bf76cbd49a8e282d4e0f319b39097ff'
-          BLOCK_SHA256 = 'bacf248e56134b79be9d87fc9a301c9feb59d71710851024c049b1f1d985c310'
-          VERSION = '2026-09-11.1'
+          PROTOCOL_SHA256 = 'f1af5e1becc16164fd7e953db0027562caa8bb5669016edde53635967cbec64f'
+          BLOCK_SHA256 = '1372b7ac3e5ec81864032af3aca34c4e82895d1dda93ae1b3f344b5d4b6e20ca'
+          VERSION = '2026-09-11.2'
           GOVERNANCE_TICKET = 'MIXSTUDIO-501'
 
           protocol = Path('docs/tracking-protocol.md')

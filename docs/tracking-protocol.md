@@ -1,6 +1,6 @@
 # Maintainer tracking protocol
 
-Protocol version: `2026-09-11.1` · Governance ticket: `MIXSTUDIO-501`.
+Protocol version: `2026-09-11.2` · Governance tickets: `MIXSTUDIO-501`, `MIXSTUDIO-505`.
 
 This protocol applies to Mixio maintainer engineering and governance work. Public skill users and normal creative production do not need private Plane access. In production/sample workspaces (`avgc-mcp-setup`, `mixio-agent-setup`), contributor changes to skills, setup, or tooling belong to MIXSKILLS; making a film or using installed skills follows the production workflow. In `founder-office`, this protocol covers product engineering only; existing local reference context and Outline financial, commercial, and operating records retain their ownership.
 
@@ -62,7 +62,19 @@ Inspect relevant IMPs, scoped TBRs, and MPRs; include applicable MPR mitigations
 
 **Done when:** live ticket scope and Link results, or explicit availability failures, are recorded with the working branch/worktree before code changes.
 
-## 2. Material changes: keep execution and decisions current
+## 2. Execute in Paseo-managed workspaces
+
+Paseo owns the execution environment; Plane remains the source of truth for the work item and Link remains the source-backed context layer. Before starting or delegating maintainer work, list Paseo workspaces and reuse the one whose `cwd` is the resolved checkout. Rename it to identify the ticket when that makes the work easier to find. Do not create a second manual Git worktree for a branch that Paseo already manages.
+
+Create a new independent implementation checkout through Paseo when a separate branch is needed. Use a new branch from a verified base for fresh work, or check out the existing branch or PR when reviewing it. Record the Paseo workspace ID, repository path, branch or PR, and canonical Plane ticket in the working plan and the eventual handoff. Existing dirty or unregistered worktrees are evidence to adopt and map; never archive, delete, or recreate them merely to make the registry look clean.
+
+When delegating, list the configured Paseo profiles first and choose the profile that matches the task. Create the agent in the resolved workspace, give it one bounded ticket-scoped assignment, and retain its agent ID with the execution evidence. A delegated agent must not change Plane, merge, push, deploy, or alter branch protection unless that action is explicitly authorized. Use the agent lifecycle and its handoff as execution evidence; do not infer successful implementation from a running agent or a workspace title.
+
+At handoff, capture the workspace and agent IDs, branch/PR, verification result, and any outstanding permission or execution state. Archive only Paseo workspaces and agents that are known to be finished and whose worktree can safely be removed; retain unresolved, inaccessible, or user-owned worktrees as visible coverage gaps.
+
+**Done when:** the execution workspace and, when used, agent are identifiable from the ticket handoff; Plane, Link, and Paseo roles remain distinct.
+
+## 3. Material changes: keep execution and decisions current
 
 Update the live ticket after scope changes, discoveries that change acceptance criteria, blockers, meaningful implementation or verification results, and handoffs. Include the affected repository and evidence; read back the update and state to confirm it persisted. Before contacting another person through a comment or message, ensure the session authorizes that communication. Plane owns committed work and its state; repository docs/specs own implementation details; Link contains source-backed synthesis and reviewed memory.
 
@@ -70,7 +82,7 @@ Record factual source notes with provenance, date, affected repository, and tick
 
 **Done when:** the ticket reflects the material change and readback succeeded; factual notes and any pending memory proposals are distinguishable.
 
-## 3. Verify and hand off: report each lifecycle separately
+## 4. Verify and hand off: report each lifecycle separately
 
 Run the checks required by the acceptance criteria and repository instructions. In the ticket and handoff, report each dimension separately, with evidence or an explicit unknown:
 
@@ -83,7 +95,7 @@ Do not infer merged or deployed from a passing test, an open PR, or an implement
 
 **Done when:** acceptance-criteria results, lifecycle evidence, final live ticket state, Link/source-note status, and remaining work are visible in the handoff.
 
-## 4. Unavailable services and retry evidence
+## 5. Unavailable services and retry evidence
 
 If Plane, Link, the shared registry, or an update/readback is unavailable, state which checkpoint failed and why. Save a local retry artifact outside the repository (for example in the user's private state directory) containing the ticket, repository, branch/worktree, timestamp, attempted operation, safe error summary, intended update, and exact retry action. Exclude credentials and sensitive response bodies. Mark that checkpoint **unsynced** until the retry and readback succeed. Continue independent work only when its scope is already authorized; missing acceptance criteria block dependent implementation. A local artifact, cache, or mirror is not evidence that Plane or Link was updated.
 
