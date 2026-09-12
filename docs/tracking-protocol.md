@@ -1,6 +1,8 @@
 # Maintainer tracking protocol
 
-Protocol version: `2026-09-11.2` · Governance tickets: `MIXSTUDIO-501`, `MIXSTUDIO-505`.
+Protocol version: `2026-09-12.1` · Governance tickets: `MIXSTUDIO-501`, `MIXSTUDIO-505`.
+
+The [contributor operating skill](../.agents/skills/mixio-maintainer/SKILL.md) adds proportional planning, shared-context handling, resource allocation, and recovery. The [repository context guide](repository-context.md) identifies this checkout's ownership and source entry points. This protocol defines the tracking mechanics used by both.
 
 This protocol applies to Mixio maintainer engineering and governance work. Public skill users and normal creative production do not need private Plane access. In production/sample workspaces (`avgc-mcp-setup`, `mixio-agent-setup`), contributor changes to skills, setup, or tooling belong to MIXSKILLS; making a film or using installed skills follows the production workflow. In `founder-office`, this protocol covers product engineering only; existing local reference context and Outline financial, commercial, and operating records retain their ownership.
 
@@ -10,7 +12,7 @@ Before implementation, read the live Plane ticket, its state, acceptance criteri
 
 Read Link at session start, again before a material task, and before decisions that rely on project history. Resolve roots from environment overrides first (`MIXIO_LINK_ROOT`, then `LINK_ROOT`; `MIXIO_TRACKING_ROOT` for shared checks), then the user-local `~/.config/mixio/tracking.json` keys `link_root` and `tracking_root`. Maintainer setup supplies the actual checkout paths in that local JSON file; keep machine paths out of committed documentation. Validate the resolved directories and required files. Never substitute the current repository or an invented path when configuration is absent.
 
-Use this safe JSON resolver; it reads data without sourcing shell configuration:
+Use this safe JSON resolver; it reads data without sourcing shell configuration. Set `mixio_project_key` to the repository key shown in this checkout's context guide before running the example. That scope includes company/global memories plus the relevant repository's memories.
 
 ```sh
 mixio_resolve_root() {
@@ -51,12 +53,15 @@ mixio_link() {
     python3 "$mixio_link_root/link.py" "$@"
   fi
 }
+: "${mixio_project_key:?Set the repository key from docs/repository-context.md}"
 mixio_link health "$mixio_link_root"
-mixio_link brief 'session start' "$mixio_link_root"
-mixio_link query 'TICKET: task and repository scope' "$mixio_link_root" --budget micro
+mixio_link brief 'session start' "$mixio_link_root" --project "$mixio_project_key"
+mixio_link query 'TICKET: task and repository scope' "$mixio_link_root" --project "$mixio_project_key" --budget micro
 ```
 
 Use `lnk` when available and the Python entry point otherwise. Pass the verified root after positional text and before flags, as shown above.
+
+The executable path and the data root are separate. Pass the explicit data root to capture, handoff, and maintenance commands too; inspect their `--help` for positional arguments. Never rely on the current directory or a CLI default to select shared memory. A worktree can hold drafts while the shared root holds reviewed context; record the draft's source/revision and publication state before another agent relies on it. The configured Link root and tracking source checkout may differ, so instructions being edited in a worktree are not automatically published knowledge.
 
 Inspect relevant IMPs, scoped TBRs, and MPRs; include applicable MPR mitigations in acceptance criteria. Follow stronger existing repository Link checkpoints as well. The Python fallback executes the same CLI lifecycle; it does not replace a required CLI checkpoint with MCP.
 
@@ -109,5 +114,7 @@ python3 "$mixio_tracking_root/scripts/tracking.py" --help
 ```
 
 Maintainers update the canonical protocol and ownership registry in the shared tracking repository, then propagate the versioned managed block and this exact protocol to maintained checkouts. Preserve existing agent instructions, dirty edits, and CLAUDE symlinks. Validate every accessible registered worktree; report inaccessible or newly created worktrees as coverage gaps. `studio/apps/mixio-lens` inherits Studio ownership and its root protocol. Public skill payloads must remain free of internal hosts, credentials, and mandatory private tracking setup.
+
+Publish the operating skill and its referenced assets with the protocol, plus a repository context guide rendered from the owning registry entry. Keep the contributor skill separate from production skill payloads. Update the shared source first and propagate verified copies; independent forks of these instructions need an explicit local scope. Nested instructions inherit these contributor checkpoints; retain their runtime/production constraints and fix any conflicting root guidance explicitly. Existing sessions must reread changed guidance at the next material checkpoint; file presence alone does not show that a running agent loaded it.
 
 Where installed, `.github/workflows/mixio-tracking.yml` checks protocol integrity and an explicit governing ticket line in the PR body without private credentials. Refresh its protocol hash when propagating protocol changes. This offline guard checks ticket syntax and registered ownership only; confirm ticket existence, acceptance criteria, and current state through the live Plane checkpoints above. Required branch protection and a successful hosted CI run require separate repository configuration and evidence.

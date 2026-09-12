@@ -1,7 +1,7 @@
 See [AGENTS.md](AGENTS.md) for repository guidance.
 
-<!-- BEGIN MIXIO TRACKING v2026-09-11.2 -->
+<!-- BEGIN MIXIO TRACKING v2026-09-12.1 -->
 ## Maintainer tracking checkpoints
 
-For Mixio maintainer engineering or governance work, read [docs/tracking-protocol.md](docs/tracking-protocol.md) before implementation, after material scope or status changes, and before handoff. Follow its live Plane ticket, branch/worktree acceptance criteria, configured Link CLI, and Paseo workspace/agent lifecycle. Resolve or create execution workspaces through Paseo; do not create duplicate manual worktrees for a branch Paseo already manages. Report implemented, verified, merged, and deployed separately; durable memories remain proposals until approved. This governs contributor changes only: public skill users and normal creative production need no private Plane setup. Founder Office financial/commercial and Outline ownership remains intact.
+For Mixio contributor planning, implementation, review, or task recovery, read [.agents/skills/mixio-maintainer/SKILL.md](.agents/skills/mixio-maintainer/SKILL.md) and [docs/repository-context.md](docs/repository-context.md) before material work, after scope changes, and before handoff. Apply [docs/tracking-protocol.md](docs/tracking-protocol.md) for live Plane scope, explicit shared Link roots, and Paseo workspaces. Keep unresolved policy visible and report implemented, verified, merged, and deployed separately. This governs contributor changes: public skill users and normal creative production need no private tracking setup. Founder Office financial/commercial and Outline ownership remains intact.
 <!-- END MIXIO TRACKING -->

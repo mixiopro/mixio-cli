@@ -19,14 +19,24 @@ jobs:
           from pathlib import Path
 
           EXPECTED_PROJECT = 'MIXSTUDIO'
-          PROTOCOL_SHA256 = 'f1af5e1becc16164fd7e953db0027562caa8bb5669016edde53635967cbec64f'
-          BLOCK_SHA256 = '1372b7ac3e5ec81864032af3aca34c4e82895d1dda93ae1b3f344b5d4b6e20ca'
-          VERSION = '2026-09-11.2'
+          PROTOCOL_SHA256 = 'dd9dd9a3da93b2224a1ee192381ac5906c8ecf2a933207252ff8cd99558747a7'
+          BLOCK_SHA256 = 'ae77fa3bc1021519eb1ff0a3d135fdce24df4de1d9da78365ac5283a6feea280'
+          VERSION = '2026-09-12.1'
           GOVERNANCE_TICKET = 'MIXSTUDIO-501'
+
+          ASSET_SHA256 = {
+              '.agents/skills/mixio-maintainer/SKILL.md': 'b7fd8295d132982bb6b4087e0f27e9369f54bdee619d8452732a0514dd93f7e9',
+              '.agents/skills/mixio-maintainer/references/handoff.md': '108be9bb215d919daeaff5496cc025e18c4c885cd5c3a0150382ac560516b73f',
+              'docs/repository-context.md': 'cb3e54609a2b9cd6f18eba7ebadf85f866f3c230d89fde9abfa32d9f89e00ef0',
+          }
 
           protocol = Path('docs/tracking-protocol.md')
           if not protocol.is_file() or hashlib.sha256(protocol.read_bytes()).hexdigest() != PROTOCOL_SHA256:
               raise SystemExit('Tracking protocol missing or changed: propagate the reviewed protocol and refresh this guard hash.')
+          for filename, expected in ASSET_SHA256.items():
+              path = Path(filename)
+              if not path.is_file() or hashlib.sha256(path.read_bytes()).hexdigest() != expected:
+                  raise SystemExit(f'{filename}: required shared tracking asset missing or changed.')
           for filename in ('AGENTS.md', 'CLAUDE.md'):
               path = Path(filename)
               if not path.is_file():
