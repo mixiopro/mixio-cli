@@ -51,10 +51,28 @@ cargo install --path .
    # or through a friendly noun/verb group, where one was cleanly derivable
    mixio project list
    mixio project create --title "My Project"
+
+   # local-file commands use the same noun-first CLI convention
+   mixio file upload ./reference.png --project-id <project-id> --category reference
+   mixio file url ./reference.png
    ```
 
 `mixio auth use <name>` switches the active profile; `mixio auth list` shows all of them.
 Re-run `mixio tools refresh` after a Mixio deploy to pick up new/changed tools.
+
+### Local files
+
+The stdio MCP bridge can read files from the local filesystem; the hosted MCP endpoint cannot.
+The CLI therefore provides static noun-first commands for the same local-file workflow:
+
+```bash
+mixio file upload ./render.mp4 --project-id <project-id> --category generated_video
+mixio file url ./render.mp4
+mixio file url ./render.mp4 --no-upload   # cache-only lookup
+```
+
+These commands upload through Inference Files, associate the result with Studio, and cache
+the path/SHA-256 mapping per profile. Hosted tools remain available through `mixio call`.
 
 ## For AI agents
 
