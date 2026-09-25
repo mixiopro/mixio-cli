@@ -567,13 +567,13 @@ fn option_string(matches: &ArgMatches, name: &str) -> Option<String> {
         .filter(|value| !value.is_empty())
 }
 
-fn media_options(matches: &ArgMatches) -> MediaOptions {
+fn media_options(matches: &ArgMatches, force: bool) -> MediaOptions {
     MediaOptions {
         project_id: option_string(matches, "project-id"),
         organization_id: option_string(matches, "organization-id"),
         alt: option_string(matches, "alt"),
         category: option_string(matches, "category"),
-        force: matches.get_flag("force"),
+        force,
     }
 }
 
@@ -655,13 +655,21 @@ pub async fn handle_file(sub: &ArgMatches) -> Result<()> {
     match verb {
         "upload" => println!(
             "{}",
-            serde_json::to_string_pretty(&client.upload(path, media_options(matches)).await?)?
+            serde_json::to_string_pretty(
+                &client
+                    .upload(path, media_options(matches, matches.get_flag("force")))
+                    .await?,
+            )?
         ),
         "url" => println!(
             "{}",
             serde_json::to_string_pretty(
                 &client
-                    .public_url(path, media_options(matches), !matches.get_flag("no-upload"))
+                    .public_url(
+                        path,
+                        media_options(matches, false),
+                        !matches.get_flag("no-upload")
+                    )
                     .await?,
             )?
         ),
@@ -738,5 +746,6 @@ mod tests {
             .expect("file url syntax should parse");
         let (_, args) = matches.subcommand().expect("file verb");
         assert!(args.get_flag("no-upload"));
+        assert!(!media_options(args, false).force);
     }
 }
