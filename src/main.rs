@@ -1,6 +1,7 @@
 mod cache;
 mod groups;
 mod mcp;
+mod media;
 mod profile;
 mod schema;
 mod update_check;
@@ -10,7 +11,7 @@ use clap::{Arg, Command};
 use mcp::McpClient;
 use serde_json::Value;
 
-const RESERVED_NAMES: &[&str] = &["auth", "tools", "list-tools", "call", "help"];
+const RESERVED_NAMES: &[&str] = &["auth", "tools", "list-tools", "call", "file", "help"];
 
 #[tokio::main]
 async fn main() -> Result<()> {
@@ -64,6 +65,7 @@ async fn main() -> Result<()> {
                 .subcommand(Command::new("refresh").about("Re-fetch tools/list from the active profile's MCP endpoint")),
         )
         .subcommand(Command::new("list-tools").about("List cached MCP tools"))
+        .subcommand(media::build_file_command())
         .subcommand(call_cmd);
 
     // Derived `mixio <noun> <verb>` shortcuts — see groups.rs for why a noun
@@ -86,6 +88,7 @@ async fn main() -> Result<()> {
         Some(("auth", sub)) => handle_auth(sub)?,
         Some(("tools", sub)) => handle_tools(sub).await?,
         Some(("list-tools", _)) => handle_list_tools(&cached, &groups)?,
+        Some(("file", sub)) => media::handle_file(sub).await?,
         Some(("call", sub)) => {
             let Some((display_name, tool_matches)) = sub.subcommand() else {
                 bail!("specify a tool — see `mixio call --help`");
