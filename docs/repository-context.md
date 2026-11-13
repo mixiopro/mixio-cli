@@ -1,7 +1,6 @@
 # Repository context
 
 - **Link project scope:** `cli` — pass `--project cli` to Link commands to include company/global context and this repository's scoped memories.
-- **Owning Plane project:** `MIXSTUDIO`
 - **Repository:** `mixiopro/mixio-cli`
 - **Purpose:** Mixio command-line client and packaging.
 - **Entry points:**
@@ -19,5 +18,3 @@
 ## Local links
 
 - [Repository instructions](../AGENTS.md)
-- [Maintainer tracking protocol](tracking-protocol.md)
-- [Contributor operating skill](../.agents/skills/mixio-maintainer/SKILL.md)
